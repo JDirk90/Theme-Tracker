@@ -1,0 +1,109 @@
+
+/* ── Visualizer Controls ──────────────────────────────────────────────────── */
+.visualizer-controls {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 24px;
+  padding: 0 8px;
+}
+
+.control-label {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  font-weight: 500;
+}
+
+.pill-group {
+  display: flex;
+  background: var(--bg-card);
+  border: 1px solid var(--border-subtle);
+  border-radius: 20px;
+  overflow: hidden;
+}
+
+.pill-btn {
+  background: transparent;
+  border: none;
+  padding: 6px 16px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.pill-btn:hover {
+  color: var(--text-primary);
+  background: rgba(255, 255, 255, 0.03);
+}
+
+.pill-btn.active {
+  background: rgba(139, 92, 246, 0.15);
+  color: var(--accent-purple);
+}
+
+/* ── Data Table Accordion ──────────────────────────────────────────────────── */
+.accordion-trigger {
+  cursor: pointer;
+}
+
+.accordion-trigger:hover .accordion-icon {
+  color: var(--accent-purple);
+}
+
+.accordion-trigger.active {
+  background: rgba(139, 92, 246, 0.05) !important;
+  border-bottom: none;
+}
+
+.accordion-icon {
+  width: 30px;
+  font-size: 0.7rem;
+  transition: color 0.2s, transform 0.2s;
+}
+
+.accordion-content-row {
+  background: var(--bg-card);
+}
+
+.accordion-content-row td {
+  padding: 0 !important;
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+.accordion-content {
+  padding: 16px 32px 24px 64px;
+  background: rgba(0, 0, 0, 0.1);
+  box-shadow: inset 0 24px 24px -24px rgba(0, 0, 0, 0.2);
+  animation: slideDown 0.3s ease-out;
+}
+
+.inner-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.inner-table th {
+  padding: 8px 16px;
+  font-size: 0.65rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  border-bottom: 1px solid var(--border-dark);
+}
+
+.inner-table td {
+  padding: 10px 16px;
+  font-size: 0.8rem;
+  border-bottom: 1px solid var(--border-dark);
+}
+
+.inner-table tbody tr:hover {
+  background: rgba(255, 255, 255, 0.02);
+}
+
+@keyframes slideDown {
+  from { opacity: 0; transform: translateY(-10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
