@@ -39,7 +39,7 @@ export async function fetchAllQuotes(categories, customTickers = [], timeframe =
     // Deduplicate array
     const allSymbols = [...new Set([...categoryTickers, ...customTickers])];
 
-    const response = await fetch('http://localhost:3001/api/quote', {
+    const response = await fetch('/api/quote', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ symbols: allSymbols, timeframe, force })

@@ -327,9 +327,18 @@ async function processHistoryQueue() {
 
 setInterval(processHistoryQueue, 2500);
 
+// ── Serve Vite production build ──────────────────────────────────────────────
+const distPath = path.resolve(__dirname, 'dist');
+app.use(express.static(distPath));
+
+// Catch-all: serve index.html for any non-API request (client-side routing)
+app.get('*', (req, res) => {
+  res.sendFile(path.resolve(distPath, 'index.html'));
+});
+
 // ── Start server ─────────────────────────────────────────────────────────────
 app.listen(PORT, () => {
-  console.log(`\n🚀 Market Dashboard API running on http://localhost:${PORT}`);
+  console.log(`\n🚀 Theme Tracker running on http://localhost:${PORT}`);
   console.log(`   Health: http://localhost:${PORT}/api/health`);
   console.log(`   Quote:  http://localhost:${PORT}/api/quote?symbols=AAPL,MSFT\n`);
 });
