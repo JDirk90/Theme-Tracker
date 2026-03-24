@@ -46,7 +46,16 @@ export async function fetchAllQuotes(categories, customTickers = [], timeframe =
     });
   
     if (!response.ok) {
-      throw new Error(`API error: ${response.status} ${response.statusText}`);
+      let msg = response.statusText;
+      try {
+        const errData = await response.json();
+        if (errData.message || errData.error) {
+          msg = errData.message || errData.error;
+        }
+      } catch (e) {
+        // Fall back to statusText if response isn't JSON
+      }
+      throw new Error(`API error ${response.status}: ${msg}`);
     }
 
     const data = await response.json();
@@ -64,7 +73,7 @@ export async function fetchAllQuotes(categories, customTickers = [], timeframe =
 
   } catch (error) {
     console.error("Error fetching all quotes:", error);
-    return new Map(); // Return an empty map on error
+    throw error; // Re-throw so App.jsx can display an error banner
   }
 }
 

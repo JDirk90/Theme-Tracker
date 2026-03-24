@@ -111,7 +111,7 @@ export default function App() {
           marketState={marketState}
           lastUpdated={lastUpdated}
           loading={loading}
-          onRefresh={loadData}
+          onRefresh={handleRefresh}
           onMenuToggle={() => setSidebarOpen(true)}
         />
 

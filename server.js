@@ -15,6 +15,19 @@ const PORT = 3001;
 const yf = new YahooFinance();
 try { YahooFinance.suppressNotices?.(['yahooSurvey']); } catch (_) { /* ignore */ }
 
+// Add robust browser-mimicking headers
+yf.setGlobalConfig({
+  fetchOptions: {
+    headers: {
+      'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36',
+      'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8',
+      'Accept-Language': 'en-US,en;q=0.9',
+      'Cache-Control': 'no-cache',
+      'Pragma': 'no-cache',
+    }
+  }
+});
+
 // ── In-memory cache ──────────────────────────────────────────────────────────
 const cache = new Map();
 const CACHE_TTL = 60_000; // 60 seconds
