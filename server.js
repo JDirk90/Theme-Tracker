@@ -15,22 +15,19 @@ const PORT = 3001;
 const yf = new YahooFinance();
 try { YahooFinance.suppressNotices?.(['yahooSurvey']); } catch (_) { /* ignore */ }
 
-// Add robust browser-mimicking headers
-yf.setGlobalConfig({
-  fetchOptions: {
-    headers: {
-      'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36',
-      'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8',
-      'Accept-Language': 'en-US,en;q=0.9',
-      'Cache-Control': 'no-cache',
-      'Pragma': 'no-cache',
-    }
-  }
-});
-
 // ── In-memory cache ──────────────────────────────────────────────────────────
 const cache = new Map();
 const CACHE_TTL = 60_000; // 60 seconds
+
+// ── Yahoo Finance Options ────────────────────────────────────────────────────
+const yfOptions = {
+  fetchOptions: {
+    headers: {
+      'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36',
+      'Accept': 'application/json, text/plain, */*'
+    }
+  }
+};
 
 // ── Force-refresh rate limiting ──────────────────────────────────────────────
 const FORCE_COOLDOWN = 5_000; // 5 seconds between forced refreshes
@@ -109,7 +106,10 @@ async function processQueue() {
     
     for (const sym of batch) {
       try {
-        const res = await yf.quoteSummary(sym, { modules: ['financialData', 'defaultKeyStatistics', 'summaryDetail'] });
+        const res = await yf.quoteSummary(sym, { 
+          modules: ['financialData', 'defaultKeyStatistics', 'summaryDetail'],
+          ...yfOptions
+        });
         const sg = res?.financialData?.revenueGrowth ?? null;
         const ps = res?.summaryDetail?.priceToSalesTrailing12Months ?? res?.defaultKeyStatistics?.priceToSalesTrailing12Months ?? null;
         
@@ -181,7 +181,7 @@ app.post('/api/quote', async (req, res) => {
     console.log(`📡 Fetching ${symbolList.length} symbols from Yahoo Finance...`);
 
     // Single call — the library handles large arrays internally
-    const rawResults = await yf.quote(symbolList);
+    const rawResults = await yf.quote(symbolList, yfOptions);
     const allResults = Array.isArray(rawResults) ? rawResults : [rawResults];
 
     console.log(`✅ Received ${allResults.length} results`);
@@ -315,7 +315,7 @@ async function processHistoryQueue() {
       p2.setDate(p2.getDate() + 1);
 
       try {
-        const hist = await yf.historical(sym, { period1: p1, period2: p2 });
+        const hist = await yf.historical(sym, { period1: p1, period2: p2, ...yfOptions });
         const hCache = historyCache.get(sym) || {};
         
         if (hist && hist.length > 0) {
