@@ -1,7 +1,8 @@
 export default function Sidebar({ activeTool, onSelectTool, isOpen, onClose }) {
   const TOOLS = [
     { id: 'Visualizer', name: 'Visualizer', icon: '📊' },
-    { id: 'Table', name: 'Data Table', icon: '📄' }
+    { id: 'Table', name: 'Data Table', icon: '📄' },
+    { id: 'Sentiment', name: 'Sentiment', icon: '🧠' }
   ];
 
   return (

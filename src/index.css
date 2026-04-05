@@ -277,6 +277,13 @@ body::before {
   gap: 16px;
 }
 
+.last-updated {
+  font-size: 0.68rem;
+  color: var(--text-dim);
+  font-weight: 500;
+  white-space: nowrap;
+}
+
 .market-status {
   display: flex;
   align-items: center;
@@ -1258,4 +1265,981 @@ body::before {
 @keyframes slideDown {
   from { opacity: 0; transform: translateY(-5px); }
   to { opacity: 1; transform: translateY(0); }
+}
+
+/* ── Sentiment Dashboard ─────────────────────────────────────────────────── */
+.sentiment-dashboard {
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
+  animation: fadeInUp 0.4s ease-out both;
+}
+
+/* ── Gauge Wrapper ────────────────────────────────────────────────────────── */
+.sentiment-gauge-wrapper {
+  background: var(--bg-card);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-lg);
+  padding: 28px 32px 36px;
+  position: relative;
+  overflow: hidden;
+}
+
+.sentiment-gauge-wrapper::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(ellipse at 50% 0%, rgba(139, 92, 246, 0.04) 0%, transparent 70%);
+  pointer-events: none;
+}
+
+.sentiment-gauge-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 24px;
+  position: relative;
+  z-index: 1;
+}
+
+.sentiment-gauge-title {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  letter-spacing: -0.01em;
+}
+
+.sentiment-gauge-label {
+  font-size: 0.82rem;
+  font-weight: 700;
+  padding: 4px 14px;
+  border-radius: 20px;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+}
+
+.sentiment-gauge-label.extreme-fear { background: rgba(239, 68, 68, 0.15); color: #f87171; }
+.sentiment-gauge-label.fear { background: rgba(249, 115, 22, 0.15); color: #fb923c; }
+.sentiment-gauge-label.mild-fear { background: rgba(251, 146, 60, 0.12); color: #fdba74; }
+.sentiment-gauge-label.neutral { background: rgba(148, 163, 184, 0.12); color: var(--text-secondary); }
+.sentiment-gauge-label.mild-greed { background: rgba(74, 222, 128, 0.12); color: #86efac; }
+.sentiment-gauge-label.greed { background: rgba(34, 197, 94, 0.15); color: #4ade80; }
+.sentiment-gauge-label.extreme-greed { background: rgba(34, 197, 94, 0.2); color: #22c55e; }
+
+/* ── Gauge Track ──────────────────────────────────────────────────────────── */
+.sentiment-gauge-track {
+  position: relative;
+  height: 48px;
+  margin-bottom: 8px;
+  z-index: 1;
+}
+
+.sentiment-gauge-gradient {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 18px;
+  border-radius: 9px;
+  background: linear-gradient(
+    90deg,
+    #dc2626 0%,
+    #f97316 22%,
+    #facc15 38%,
+    #a3a3a3 50%,
+    #86efac 62%,
+    #22c55e 78%,
+    #15803d 100%
+  );
+  box-shadow: 0 2px 16px rgba(0, 0, 0, 0.3);
+}
+
+/* ── Needle ───────────────────────────────────────────────────────────────── */
+.sentiment-gauge-needle {
+  position: absolute;
+  top: 0;
+  transform: translateX(-50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  transition: left 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+  z-index: 2;
+}
+
+.needle-line {
+  width: 3px;
+  height: 24px;
+  background: var(--text-primary);
+  border-radius: 2px;
+  box-shadow: 0 0 8px rgba(255, 255, 255, 0.3);
+}
+
+.needle-score {
+  font-size: 0.85rem;
+  font-weight: 800;
+  color: var(--text-primary);
+  margin-top: 4px;
+  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.5);
+}
+
+/* ── Gauge Axis Labels ────────────────────────────────────────────────────── */
+.sentiment-gauge-labels {
+  position: absolute;
+  bottom: -4px;
+  left: 0;
+  right: 0;
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.62rem;
+  font-weight: 600;
+  color: var(--text-dim);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+/* ── Composite Weights Row ────────────────────────────────────────────────── */
+.composite-weights-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin-top: 20px;
+  padding-top: 16px;
+  border-top: 1px solid var(--border-subtle);
+  flex-wrap: wrap;
+  position: relative;
+  z-index: 1;
+}
+
+.composite-weight-item {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 10px;
+  border-radius: 6px;
+  background: rgba(148, 163, 184, 0.06);
+  border: 1px solid var(--border-subtle);
+  font-size: 0.68rem;
+}
+
+.composite-weight-icon {
+  font-size: 0.75rem;
+}
+
+.composite-weight-label {
+  color: var(--text-muted);
+  font-weight: 600;
+}
+
+.composite-weight-score {
+  font-weight: 800;
+  font-size: 0.78rem;
+}
+
+.composite-weight-pct {
+  font-size: 0.58rem;
+  color: var(--text-dim);
+  font-weight: 700;
+}
+
+/* ── Percentile Pill (on each card) ──────────────────────────────────────── */
+.percentile-pill {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 8px;
+  border-radius: 6px;
+  background: rgba(148, 163, 184, 0.06);
+  border: 1px solid var(--border-subtle);
+  flex-shrink: 0;
+}
+
+.percentile-score {
+  font-size: 0.85rem;
+  font-weight: 800;
+}
+
+.percentile-weight {
+  font-size: 0.55rem;
+  color: var(--text-dim);
+  font-weight: 700;
+  padding-left: 2px;
+  border-left: 1px solid var(--border-subtle);
+  margin-left: 2px;
+}
+
+/* ── Info-only pill (for Panic Curve & Rubber Band) ──────────────────────── */
+.percentile-pill-info {
+  font-size: 0.55rem;
+  font-weight: 800;
+  padding: 3px 8px;
+  border-radius: 6px;
+  background: rgba(139, 92, 246, 0.08);
+  border: 1px solid rgba(139, 92, 246, 0.15);
+  color: var(--accent-purple);
+  letter-spacing: 0.08em;
+  flex-shrink: 0;
+}
+
+/* ── Card Header Row (title + pill aligned) ──────────────────────────────── */
+.sentiment-card-header-row {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+/* ── Signal Cards ─────────────────────────────────────────────────────────── */
+.sentiment-cards {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+}
+
+.sentiment-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  padding: 20px;
+  display: flex;
+  gap: 14px;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+}
+
+.sentiment-card:hover {
+  border-color: rgba(139, 92, 246, 0.3);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.25);
+  background: var(--bg-card-hover);
+}
+
+.sentiment-card-icon {
+  font-size: 1.6rem;
+  line-height: 1;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.sentiment-card-body {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+}
+
+.sentiment-card-title {
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.sentiment-card-subtitle {
+  font-size: 0.65rem;
+  color: var(--text-dim);
+  font-weight: 500;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.sentiment-card-metrics {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 6px;
+}
+
+.sentiment-card-value {
+  font-size: 1.15rem;
+  font-weight: 800;
+  line-height: 1;
+}
+
+/* ── Signal Badges ────────────────────────────────────────────────────────── */
+.sentiment-signal-badge {
+  font-size: 0.6rem;
+  font-weight: 700;
+  padding: 3px 8px;
+  border-radius: 4px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  white-space: nowrap;
+}
+
+.badge-greed { background: rgba(34, 197, 94, 0.15); color: #4ade80; }
+.badge-mild-greed { background: rgba(74, 222, 128, 0.12); color: #86efac; }
+.badge-neutral { background: rgba(148, 163, 184, 0.1); color: var(--text-secondary); }
+.badge-mild-fear { background: rgba(251, 146, 60, 0.12); color: #fdba74; }
+.badge-fear { background: rgba(249, 115, 22, 0.15); color: #fb923c; }
+.badge-extreme-fear { background: rgba(239, 68, 68, 0.18); color: #f87171; }
+
+/* ── Basket Breakdown ─────────────────────────────────────────────────────── */
+.sentiment-breakdown {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 16px;
+}
+
+.breakdown-section {
+  background: var(--bg-card);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  padding: 18px 20px;
+}
+
+.breakdown-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--border-subtle);
+  margin-bottom: 10px;
+}
+
+.breakdown-title {
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.breakdown-avg {
+  font-size: 1rem;
+  font-weight: 800;
+}
+
+.breakdown-tickers {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.breakdown-ticker {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 4px 0;
+}
+
+.breakdown-sym {
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  width: 48px;
+}
+
+.breakdown-name {
+  flex: 1;
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.breakdown-pct {
+  font-size: 0.82rem;
+  font-weight: 700;
+  text-align: right;
+  width: 60px;
+}
+
+.breakdown-tf-header {
+  font-size: 0.65rem;
+  font-weight: 800;
+  color: var(--text-dim);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  text-align: right;
+  width: 60px;
+}
+
+.breakdown-ticker-header-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 4px 0 8px 0;
+  border-bottom: 1px dashed var(--border-subtle);
+  margin-bottom: 8px;
+}
+
+/* ── Mini Gauges Row ──────────────────────────────────────────────────────── */
+.mini-gauges-row {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+}
+
+.mini-gauge {
+  background: var(--bg-card);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  padding: 16px 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.mini-gauge-label {
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.mini-gauge-track {
+  position: relative;
+  height: 10px;
+  border-radius: 5px;
+  overflow: visible;
+}
+
+.mini-gauge-gradient {
+  position: absolute;
+  inset: 0;
+  border-radius: 5px;
+  background: linear-gradient(
+    90deg,
+    #dc2626 0%, #f97316 22%, #facc15 38%, #a3a3a3 50%,
+    #86efac 62%, #22c55e 78%, #15803d 100%
+  );
+  opacity: 0.6;
+}
+
+.mini-gauge-needle {
+  position: absolute;
+  top: -2px;
+  transform: translateX(-50%);
+  transition: left 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+  z-index: 2;
+}
+
+.mini-needle-line {
+  width: 3px;
+  height: 14px;
+  background: var(--text-primary);
+  border-radius: 2px;
+  box-shadow: 0 0 6px rgba(255, 255, 255, 0.25);
+}
+
+.mini-gauge-value {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.mini-gauge-score {
+  font-size: 1.1rem;
+  font-weight: 800;
+  line-height: 1;
+}
+
+.mini-gauge-score.extreme-fear { color: #f87171; }
+.mini-gauge-score.fear { color: #fb923c; }
+.mini-gauge-score.mild-fear { color: #fdba74; }
+.mini-gauge-score.neutral { color: var(--text-secondary); }
+.mini-gauge-score.mild-greed { color: #86efac; }
+.mini-gauge-score.greed { color: #4ade80; }
+.mini-gauge-score.extreme-greed { color: #22c55e; }
+
+.mini-gauge-badge {
+  font-size: 0.58rem;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: 4px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.mini-gauge-badge.extreme-fear { background: rgba(239, 68, 68, 0.15); color: #f87171; }
+.mini-gauge-badge.fear { background: rgba(249, 115, 22, 0.15); color: #fb923c; }
+.mini-gauge-badge.mild-fear { background: rgba(251, 146, 60, 0.12); color: #fdba74; }
+.mini-gauge-badge.neutral { background: rgba(148, 163, 184, 0.12); color: var(--text-secondary); }
+.mini-gauge-badge.mild-greed { background: rgba(74, 222, 128, 0.12); color: #86efac; }
+.mini-gauge-badge.greed { background: rgba(34, 197, 94, 0.15); color: #4ade80; }
+.mini-gauge-badge.extreme-greed { background: rgba(34, 197, 94, 0.2); color: #22c55e; }
+
+/* ── Sentiment Card Tooltip (pure CSS) ─────────────────────────────────────── */
+.sentiment-card[data-tooltip]:not([data-tooltip=''])::after {
+  content: attr(data-tooltip);
+  position: absolute;
+  bottom: calc(100% + 10px);
+  left: 8px;
+  right: 8px;
+  background: rgba(17, 24, 39, 0.96);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(148, 163, 184, 0.15);
+  border-radius: var(--radius-md);
+  padding: 14px 16px;
+  font-size: 0.73rem;
+  line-height: 1.6;
+  color: var(--text-secondary);
+  box-shadow: var(--shadow-lg);
+  z-index: 20;
+  pointer-events: none;
+  opacity: 0;
+  transform: translateY(6px);
+  transition: opacity 0.15s ease-out, transform 0.15s ease-out;
+}
+
+.sentiment-card[data-tooltip]:not([data-tooltip='']):hover::after {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* ── Top Row (Risk | Rubber Band wide | Credit) ───────────────────────────── */
+.sentiment-cards-row-top {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+}
+
+.sentiment-card-wide .sentiment-card-body {
+  flex: 1;
+}
+
+/* ── Rubber Band SMA Grid ─────────────────────────────────────────────────── */
+.rb-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+  margin-top: 8px;
+  padding: 10px 0 6px;
+  border-top: 1px solid var(--border-subtle);
+}
+
+.rb-price-block,
+.rb-sma-block {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.rb-price-label,
+.rb-sma-label {
+  font-size: 0.6rem;
+  font-weight: 700;
+  color: var(--text-dim);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.rb-price-value {
+  font-size: 1rem;
+  font-weight: 800;
+  color: var(--text-primary);
+}
+
+.rb-sma-value {
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: var(--text-secondary);
+}
+
+.rb-sma-pct {
+  font-size: 0.68rem;
+  font-weight: 700;
+}
+
+.sentiment-card-value-label {
+  font-size: 0.62rem;
+  color: var(--text-dim);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+/* ── Financial Conditions Card ────────────────────────────────────────────── */
+.liq-detail-rows {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin-top: 6px;
+  padding-top: 6px;
+  border-top: 1px solid var(--border-subtle);
+}
+
+.liq-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.liq-sym {
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: var(--text-muted);
+  width: 28px;
+  flex-shrink: 0;
+}
+
+.liq-detail-sub {
+  font-size: 0.7rem;
+  color: var(--text-dim);
+  flex: 1;
+}
+
+.liq-val {
+  font-size: 0.82rem;
+  font-weight: 700;
+  text-align: right;
+}
+
+/* ── Signal Timeframes (Risk vs Safety multi-timeframe grid) ──────────────── */
+.signal-timeframes {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1.4fr;
+  gap: 6px;
+  margin-top: 8px;
+  padding-top: 8px;
+  border-top: 1px solid var(--border-subtle);
+}
+
+.signal-tf {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.signal-tf-label {
+  font-size: 0.58rem;
+  font-weight: 700;
+  color: var(--text-dim);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.signal-tf-value {
+  font-size: 0.82rem;
+  font-weight: 700;
+}
+
+.signal-tf-hero {
+  background: rgba(139, 92, 246, 0.06);
+  border-radius: var(--radius-sm);
+  padding: 4px 6px;
+  border: 1px solid rgba(139, 92, 246, 0.12);
+}
+
+.signal-hero-value {
+  font-size: 1.15rem;
+  font-weight: 800;
+  line-height: 1.2;
+}
+
+/* ── Signal Detail Grid (Copper/Gold prices, Credit ratio/SMA) ───────────── */
+.signal-detail-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 6px;
+  margin-top: 6px;
+  padding-top: 6px;
+  border-top: 1px solid var(--border-subtle);
+}
+
+.signal-detail-grid + .signal-detail-grid {
+  border-top: none;
+  padding-top: 0;
+  margin-top: 0;
+}
+
+.signal-detail {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+
+.signal-detail-label {
+  font-size: 0.58rem;
+  font-weight: 700;
+  color: var(--text-dim);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.signal-detail-value {
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: var(--text-secondary);
+}
+
+/* ── Signal Crossover Indicator ──────────────────────────────────────────── */
+.signal-crossover {
+  font-size: 0.85rem;
+  font-weight: 800;
+  letter-spacing: 0.02em;
+}
+
+/* ── Sentiment Responsive ─────────────────────────────────────────────────── */
+@media (max-width: 1200px) {
+  .sentiment-cards {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .sentiment-cards-row-top {
+    grid-template-columns: 1fr 1fr;
+  }
+  .sentiment-cards-row-top .sentiment-card-wide {
+    grid-column: 1 / -1;
+  }
+  .rb-grid {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+@media (max-width: 768px) {
+  .sentiment-cards {
+    grid-template-columns: 1fr;
+  }
+  .sentiment-cards-row-top {
+    grid-template-columns: 1fr;
+  }
+  .sentiment-breakdown {
+    grid-template-columns: 1fr;
+  }
+  .sentiment-gauge-wrapper {
+    padding: 20px 16px 30px;
+  }
+  .sentiment-gauge-labels {
+    font-size: 0.55rem;
+  }
+  .rb-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+/* ─────────────────────────────────────────────────────────────────────────── */
+/* ── Matrix & Hero Layout ─────────────────────────────────────────────────── */
+/* ─────────────────────────────────────────────────────────────────────────── */
+
+.sentiment-hero-layout {
+  display: grid;
+  grid-template-columns: 1fr 340px;
+  gap: 24px;
+  margin-bottom: 32px;
+}
+
+@media (max-width: 1100px) {
+  .sentiment-hero-layout {
+    grid-template-columns: 1fr;
+  }
+}
+
+.hero-gauges-container {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  justify-content: center;
+}
+
+.compact-gauge {
+  margin-bottom: 0 !important;
+  padding: 16px 20px 24px !important;
+}
+
+.sentiment-category-header {
+  font-size: 1.1rem;
+  font-weight: 800;
+  color: var(--text-primary);
+  margin-bottom: 16px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--border-subtle);
+  letter-spacing: -0.01em;
+}
+
+.mt-8 {
+  margin-top: 32px;
+}
+
+.matrix-hero-container {
+  background: var(--bg-card);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-lg);
+  padding: 24px;
+  display: flex;
+  gap: 24px;
+  align-items: center;
+  position: relative;
+  overflow: hidden;
+}
+
+.matrix-hero-container::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at top left, rgba(139, 92, 246, 0.03), transparent 60%);
+  pointer-events: none;
+}
+
+.sentiment-matrix {
+  position: relative;
+  flex: 1;
+  aspect-ratio: 1.5;
+  background: #0f172a;
+  border: 1px solid var(--border-subtle);
+  border-radius: 8px;
+  margin: 16px 20px 24px 48px;
+}
+
+.matrix-quadrant {
+  position: absolute;
+  width: 50%;
+  height: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0.15;
+  transition: opacity 0.3s ease;
+}
+.sentiment-matrix:hover .matrix-quadrant {
+  opacity: 0.25;
+}
+
+.quad-tl { top: 0; left: 0; background: #ef4444; border-bottom: 1px dashed rgba(255,255,255,0.1); border-right: 1px dashed rgba(255,255,255,0.1); }
+.quad-tr { top: 0; right: 0; background: #3b82f6; border-bottom: 1px dashed rgba(255,255,255,0.1); }
+.quad-bl { bottom: 0; left: 0; background: #f97316; border-right: 1px dashed rgba(255,255,255,0.1); }
+.quad-br { bottom: 0; right: 0; background: #22c55e; }
+
+.quad-label {
+  font-size: 1.5rem;
+  font-weight: 800;
+  color: white;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  opacity: 0.3;
+}
+
+.matrix-axis-x, .matrix-axis-y {
+  position: absolute;
+  background: rgba(255, 255, 255, 0.2);
+}
+.matrix-axis-x { top: 50%; left: 0; right: 0; height: 1px; }
+.matrix-axis-y { left: 50%; top: 0; bottom: 0; width: 1px; }
+
+.matrix-dot {
+  position: absolute;
+  width: 16px;
+  height: 16px;
+  transform: translate(-50%, 50%);
+  z-index: 10;
+  transition: all 0.8s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+.matrix-dot-core {
+  width: 100%;
+  height: 100%;
+  background: white;
+  border-radius: 50%;
+  box-shadow: 0 0 10px rgba(255, 255, 255, 0.8);
+}
+
+.matrix-dot-pulse {
+  position: absolute;
+  inset: -8px;
+  border-radius: 50%;
+  animation: matrix-pulse 2s infinite cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.matrix-buy { background: rgba(34, 197, 94, 0.5); border: 2px solid #22c55e; }
+.matrix-sell { background: rgba(239, 68, 68, 0.5); border: 2px solid #ef4444; }
+.matrix-bull { background: rgba(59, 130, 246, 0.5); border: 2px solid #3b82f6; }
+.matrix-bear { background: rgba(249, 115, 22, 0.5); border: 2px solid #f97316; }
+.matrix-neutral { background: rgba(148, 163, 184, 0.5); border: 2px solid #94a3b8; }
+
+@keyframes matrix-pulse {
+  0% { transform: scale(0.5); opacity: 1; }
+  100% { transform: scale(1.5); opacity: 0; }
+}
+
+.matrix-label {
+  position: absolute;
+  font-size: 0.65rem;
+  font-weight: 700;
+  color: var(--text-dim);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  white-space: nowrap;
+}
+
+.grid-top { top: -20px; left: 50%; transform: translateX(-50%); }
+.grid-bottom { bottom: -20px; left: 50%; transform: translateX(-50%); }
+.grid-left { left: -32px; top: 50%; transform: translateY(-50%) rotate(-90deg); }
+.grid-right { right: -36px; top: 50%; transform: translateY(-50%) rotate(90deg); }
+
+.matrix-title-x, .matrix-title-y {
+  position: absolute;
+  font-size: 0.75rem;
+  font-weight: 800;
+  color: var(--text-secondary);
+}
+.matrix-title-x {
+  bottom: -40px;
+  left: 50%;
+  transform: translateX(-50%);
+}
+.matrix-title-y {
+  left: -70px;
+  top: 50%;
+  transform: translateY(-50%) rotate(-90deg);
+}
+
+.matrix-readout {
+  width: 200px;
+  padding: 16px;
+  background: rgba(15, 23, 42, 0.4);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.matrix-readout-title {
+  font-size: 0.75rem;
+  color: var(--text-dim);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+}
+
+.matrix-zone-badge {
+  font-size: 0.85rem;
+  font-weight: 800;
+  padding: 6px 12px;
+  border-radius: 6px;
+  text-align: center;
+  color: white;
+  background: transparent;
+  width: fit-content;
+}
+
+.matrix-zone-desc {
+  font-size: 0.7rem;
+  color: var(--text-secondary);
+  line-height: 1.4;
+  margin-top: 4px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+.matrix-coords {
+  margin-top: 4px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.matrix-coords .coord {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.75rem;
+  font-weight: 700;
+}
+
+.coord-lbl {
+  color: var(--text-dim);
 }

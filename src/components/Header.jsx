@@ -54,6 +54,11 @@ export default function Header({ marketState, lastUpdated, loading, onRefresh, o
 
         <div className="header-right">
           <span className="nyse-clock">{clock}</span>
+          {lastUpdated && (
+            <span className="last-updated">
+              Last refreshed: {lastUpdated.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: true, timeZone: 'America/New_York' })}
+            </span>
+          )}
           <button
             className={`refresh-btn ${loading ? 'loading' : ''}`}
             onClick={onRefresh}
